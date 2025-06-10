@@ -1,0 +1,90 @@
+{% load custom_filters %} {# This should still be at the very top! #}
+
+{# payments/templates/payments/payment_type_form.html #}
+<form method="post" action="{% if form.instance.pk %}{% url 'edit_payment_type' form.instance.pk %}{% else %}{% url 'add_payment_type' %}{% endif %}">
+    {% csrf_token %}
+    {% for field in form %}
+        {# Special rendering for the 'is_active' checkbox #}
+        {% if field.name == 'is_active' %}
+            <div class="form-check mb-3">
+                {# Render the checkbox input first, with correct Bootstrap class #}
+                {{ field|add_class:"form-check-input" }}
+                {# Render the label for the checkbox #}
+                <label class="form-check-label" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {# Special rendering for the 'payment_type' select box #}
+        {% elif field.name == 'payment_type' %}
+            <div class="mb-3">
+                {{ field.label_tag }}
+                {{ field|add_class:"form-select" }}
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {# Default rendering for other fields (account_number, aadhar_number) #}
+        {% else %}
+            <div class="mb-3">
+                {{ field.label_tag }}
+                {{ field|add_class:"form-control" }}
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    {% endif %}
+    <div class="d-flex justify-content-end mt-4">
+        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>
+
+<script>
+    // Your JavaScript for dynamic fields (unchanged from previous step)
+    (function() {
+        var $form = $('form');
+        var $paymentTypeSelect = $form.find('#id_payment_type');
+        var $accountNumberField = $form.find('div.mb-3:has(#id_account_number)');
+        var $aadharNumberField = $form.find('div.mb-3:has(#id_aadhar_number)');
+
+        function toggleConditionalFields() {
+            var selectedType = $paymentTypeSelect.val();
+
+            $accountNumberField.hide();
+            $aadharNumberField.hide();
+
+            if (selectedType === 'RTGS' || selectedType === 'NEFT' || selectedType === 'CHEQUE') {
+                $accountNumberField.show();
+            } else if (selectedType === 'ABS') {
+                $aadharNumberField.show();
+            }
+        }
+
+        toggleConditionalFields();
+        $paymentTypeSelect.change(toggleConditionalFields);
+
+        $('#crudModal').on('hidden.bs.modal', function () {
+            $accountNumberField.find('input').val('');
+            $aadharNumberField.find('input').val('');
+        });
+
+    })();
+</script>

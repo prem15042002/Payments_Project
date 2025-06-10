@@ -1,0 +1,17 @@
+{# payments/templates/payments/_payment_type_detail_content.html #}
+<div class="card border-0"> {# Remove card border to fit modal better #}
+    <div class="card-body">
+        <h5 class="card-title">Payment Type: {{ payment_type.payment_type }}</h5>
+        <p class="card-text"><strong>Status:</strong>
+            {% if payment_type.is_active %}
+                <span class="badge bg-success">Active</span>
+            {% else %}
+                <span class="badge bg-danger">Inactive</span>
+            {% endif %}
+        </p>
+        <p class="card-text"><strong>Created At:</strong> {{ payment_type.created_at|date:"N j, Y, P" }}</p>
+        <p class="card-text"><strong>Last Updated:</strong> {{ payment_type.updated_at|date:"N j, Y, P" }}</p>
+        {# Add an "Edit" button if you want to allow editing directly from the view modal #}
+        <!-- <button type="button" class="btn btn-warning mt-3 edit-btn" data-pk="{{ payment_type.id }}" data-bs-dismiss="modal">Edit this Type</button> -->
+    </div>
+</div>
