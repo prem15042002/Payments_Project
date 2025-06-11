@@ -1,0 +1,44 @@
+{# payments/templates/payments/_payment_type_table_rows.html #}
+{% for payment in payment_types %}
+    <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ payment.get_transaction_type_display }}</td> {# Display human-readable transaction type #}
+        <td>{{ payment.get_payment_type_display }}</td> {# Display human-readable choice #}
+
+        {# --- NEW CELL FOR ACCOUNT/AADHAAR NUMBER --- #}
+        <td>
+            {% if payment.payment_type == 'RTGS' or payment.payment_type == 'NEFT' or payment.payment_type == 'CHEQUE' %}
+                {{ payment.account_number|default:"-" }} {# Display account number, or "-" if null/empty #}
+            {% elif payment.payment_type == 'ABS' %}
+                {{ payment.aadhar_number|default:"-" }} {# Display Aadhaar number, or "-" if null/empty #}
+            {% else %}
+                {# If you have other payment types without specific numbers, or for fallback #}
+                -
+            {% endif %}
+        </td>
+        {# --- END NEW CELL --- #}
+
+        <td>
+            {% if payment.is_active %}
+                <span class="badge bg-success">Active</span>
+            {% else %}
+                <span class="badge bg-danger">Inactive</span>
+            {% endif %}
+        </td>
+        <td>
+            <button type="button" class="btn btn-info btn-sm me-1 view-btn" title="View" data-pk="{{ payment.id }}">
+                <i class="bi bi-eye"></i> View
+            </button>
+            <button type="button" class="btn btn-warning btn-sm me-1 edit-btn" title="Edit" data-pk="{{ payment.id }}">
+                <i class="bi bi-pencil"></i> Edit
+            </button>
+            <button type="button" class="btn btn-danger btn-sm delete-btn" title="Delete" data-pk="{{ payment.id }}" data-name="{{ payment.payment_type }}">
+                <i class="bi bi-trash"></i> Delete
+            </button>
+        </td>
+    </tr>
+{% empty %}
+    <tr>
+        <td colspan="6" class="text-center">No payment types found.</td> {# Update colspan to match new column count #}
+    </tr>
+{% endfor %}
